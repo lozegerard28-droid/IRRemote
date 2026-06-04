@@ -1,0 +1,46 @@
+{
+  "version": "1.0",
+  "name": "Sombre",
+  "author": "IR Remote",
+  "description": "Thème sombre élégant",
+  "colors": {
+    "primary": "#4A90D9",
+    "secondary": "#FF6B6B",
+    "background": "#121212",
+    "surface": "#1E1E1E",
+    "surfaceElevated": "#2C2C2C",
+    "text": "#FFFFFF",
+    "textSecondary": "#AAAAAA",
+    "textDisabled": "#666666",
+    "buttonBackground": "#333333",
+    "buttonText": "#FFFFFF",
+    "buttonPressed": "#4A90D9",
+    "success": "#66BB6A",
+    "error": "#EF5350",
+    "warning": "#FFA726",
+    "favorite": "#FFD700",
+    "border": "#333333",
+    "divider": "#2A2A2A"
+  },
+  "fonts": {
+    "regular": "SFProDisplay-Regular",
+    "bold": "SFProDisplay-Bold",
+    "button": "SFProRounded-Bold",
+    "size": {
+      "small": 12,
+      "medium": 16,
+      "large": 20,
+      "button": 14
+    }
+  },
+  "shapes": {
+    "buttonCornerRadius": 12,
+    "cardCornerRadius": 16,
+    "buttonBorderWidth": 0
+  },
+  "animations": {
+    "pressScale": 0.92,
+    "pressDuration": 0.1,
+    "hapticIntensity": 0.7
+  }
+}

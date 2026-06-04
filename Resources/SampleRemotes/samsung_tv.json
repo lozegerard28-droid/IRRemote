@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "remote": {
+    "name": "Samsung TV",
+    "icon": "tv",
+    "category": "tv",
+    "manufacturer": "Samsung",
+    "model": "UE55NU7100",
+    "deviceType": "tv",
+    "layout": "3x3",
+    "buttons": [
+      { "name": "Power", "code": "0xE0E040BF", "protocol": "NEC", "bits": 32, "category": "power", "color": "#E50914" },
+      { "name": "Volume +", "code": "0xE0E0E01F", "protocol": "NEC", "bits": 32, "category": "volume", "color": "#212121" },
+      { "name": "Volume -", "code": "0xE0E0D02F", "protocol": "NEC", "bits": 32, "category": "volume", "color": "#212121" },
+      { "name": "Mute", "code": "0xE0E0F00F", "protocol": "NEC", "bits": 32, "category": "volume", "color": "#757575" },
+      { "name": "Chaîne +", "code": "0xE0E048B7", "protocol": "NEC", "bits": 32, "category": "channel", "color": "#212121" },
+      { "name": "Chaîne -", "code": "0xE0E008F7", "protocol": "NEC", "bits": 32, "category": "channel", "color": "#212121" },
+      { "name": "Source", "code": "0xE0E0807F", "protocol": "NEC", "bits": 32, "category": "input", "color": "#1A3C6E" },
+      { "name": "Menu", "code": "0xE0E058A7", "protocol": "NEC", "bits": 32, "category": "menu", "color": "#212121" },
+      { "name": "OK", "code": "0xE0E016E9", "protocol": "NEC", "bits": 32, "category": "navigation", "color": "#1A3C6E" },
+      { "name": "Retour", "code": "0xE0E01AE5", "protocol": "NEC", "bits": 32, "category": "navigation", "color": "#757575" },
+      { "name": "Home", "code": "0xE0E006F9", "protocol": "NEC", "bits": 32, "category": "navigation", "color": "#1A3C6E" },
+      { "name": "Up", "code": "0xE0E006F9", "protocol": "NEC", "bits": 32, "category": "navigation", "color": "#212121" },
+      { "name": "Down", "code": "0xE0E08679", "protocol": "NEC", "bits": 32, "category": "navigation", "color": "#212121" },
+      { "name": "Left", "code": "0xE0E0A659", "protocol": "NEC", "bits": 32, "category": "navigation", "color": "#212121" },
+      { "name": "Right", "code": "0xE0E046B9", "protocol": "NEC", "bits": 32, "category": "navigation", "color": "#212121" },
+      { "name": "1", "code": "0xE0E020DF", "protocol": "NEC", "bits": 32, "category": "number", "color": "#212121" },
+      { "name": "2", "code": "0xE0E0A05F", "protocol": "NEC", "bits": 32, "category": "number", "color": "#212121" },
+      { "name": "3", "code": "0xE0E0609F", "protocol": "NEC", "bits": 32, "category": "number", "color": "#212121" },
+      { "name": "4", "code": "0xE0E010EF", "protocol": "NEC", "bits": 32, "category": "number", "color": "#212121" },
+      { "name": "5", "code": "0xE0E0906F", "protocol": "NEC", "bits": 32, "category": "number", "color": "#212121" },
+      { "name": "6", "code": "0xE0E050AF", "protocol": "NEC", "bits": 32, "category": "number", "color": "#212121" },
+      { "name": "7", "code": "0xE0E030CF", "protocol": "NEC", "bits": 32, "category": "number", "color": "#212121" },
+      { "name": "8", "code": "0xE0E0B04F", "protocol": "NEC", "bits": 32, "category": "number", "color": "#212121" },
+      { "name": "9", "code": "0xE0E0708F", "protocol": "NEC", "bits": 32, "category": "number", "color": "#212121" },
+      { "name": "0", "code": "0xE0E08877", "protocol": "NEC", "bits": 32, "category": "number", "color": "#212121" }
+    ]
+  },
+  "metadata": {
+    "exportedAt": "2026-06-04T12:00:00Z",
+    "appVersion": "1.0.0",
+    "deviceModel": "iPhone 15 Pro",
+    "iOSVersion": "18.0"
+  }
+}

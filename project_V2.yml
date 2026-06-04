@@ -1,0 +1,63 @@
+name: IRRemote_V2
+options:
+  bundleIdPrefix: com.irremote
+  deploymentTarget:
+    iOS: "15.0"
+  xcodeVersion: "15.0"
+
+settings:
+  SWIFT_VERSION: "5.9"
+  TARGETED_DEVICE_FAMILY: "1,2"
+  INFOPLIST_FILE: Resources/Info.plist
+  PRODUCT_BUNDLE_IDENTIFIER: com.irremote.app
+
+targets:
+  IRRemote:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+        excludes:
+          - "AppCoordinator.swift"
+      - path: Core
+        excludes:
+          - "Extensions/Color+Hex.swift"
+          - "Protocols/ServiceProtocols.swift"
+          - "Helpers/AppError.swift"
+      - path: Models
+        excludes:
+          - "CoreData/IRRemote.xcdatamodeld/IRRemote.xcdatamodel"
+          - "CoreData/Remote+CoreDataProperties.swift"
+          - "CoreData/PersistenceController.swift"
+      - path: Services
+        excludes:
+          - "Backup/BackupService.swift"
+          - "Feedback/FlashService.swift"
+          - "History/HistoryService.swift"
+          - "Security/BiometricService.swift"
+          - "IR/DongleManager.swift"
+          - "Feedback/AudioService.swift"
+          - "Feedback/HapticService.swift"
+      - path: ViewModels
+        excludes:
+          - "RemoteControlViewModel.swift"
+          - "ScenarioViewModel.swift"
+          - "HomeViewModel.swift"
+          - "RoomViewModel.swift"
+      - path: Views
+        excludes:
+          - "Home/HomeView.swift"
+          - "Import/ImportView.swift"
+      - path: Resources
+        excludes:
+          - "Sounds/readme.txt"
+    info:
+      path: Resources/Info.plist
+    entitlements:
+      path: Resources/Entitlements.plist
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.irremote.app
+      DEVELOPMENT_TEAM: ""
+      CODE_SIGN_STYLE: Manual
+      CODE_SIGN_IDENTITY: "Apple Development"
+    dependencies: []

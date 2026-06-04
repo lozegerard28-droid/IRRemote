@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22G90" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Button" representedClassName="Button" syncable="YES" codeGenerationType="class">
+        <attribute name="bitCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="colorHex" optional="YES" attributeType="String"/>
+        <attribute name="iconName" optional="YES" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="irCode" attributeType="String"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="protocolType" optional="YES" attributeType="String"/>
+        <attribute name="sortOrder" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="remote" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Remote" inverseName="buttons" inverseEntity="Remote"/>
+        <relationship name="scenarioSteps" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ScenarioStep" inverseName="button" inverseEntity="ScenarioStep"/>
+    </entity>
+    <entity name="HistoryEvent" representedClassName="HistoryEvent" syncable="YES" codeGenerationType="class">
+        <attribute name="buttonName" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="irCode" attributeType="String"/>
+        <attribute name="remoteName" attributeType="String"/>
+        <attribute name="success" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <entity name="Remote" representedClassName="Remote" syncable="YES" codeGenerationType="class">
+        <attribute name="category" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="icon" optional="YES" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isFavorite" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="manufacturer" optional="YES" attributeType="String"/>
+        <attribute name="modelName" optional="YES" attributeType="String"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="sortOrder" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="buttons" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Button" inverseName="remote" inverseEntity="Button"/>
+        <relationship name="room" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Room" inverseName="remotes" inverseEntity="Room"/>
+    </entity>
+    <entity name="Room" representedClassName="Room" syncable="YES" codeGenerationType="class">
+        <attribute name="icon" optional="YES" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="sortOrder" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="remotes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Remote" inverseName="room" inverseEntity="Remote"/>
+    </entity>
+    <entity name="Scenario" representedClassName="Scenario" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="icon" optional="YES" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" attributeType="String"/>
+        <relationship name="steps" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ScenarioStep" inverseName="scenario" inverseEntity="ScenarioStep"/>
+    </entity>
+    <entity name="ScenarioStep" representedClassName="ScenarioStep" syncable="YES" codeGenerationType="class">
+        <attribute name="delay" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="sortOrder" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="button" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Button" inverseName="scenarioSteps" inverseEntity="Button"/>
+        <relationship name="scenario" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Scenario" inverseName="steps" inverseEntity="Scenario"/>
+    </entity>
+    <elements>
+        <element name="Button" positionX="-288" positionY="-36" width="168" height="149"/>
+        <element name="HistoryEvent" positionX="-27" positionY="-27" width="128" height="104"/>
+        <element name="Remote" positionX="-306" positionY="-252" width="168" height="209"/>
+        <element name="Room" positionX="-504" positionY="-306" width="128" height="119"/>
+        <element name="Scenario" positionX="-468" positionY="-144" width="128" height="104"/>
+        <element name="ScenarioStep" positionX="-504" positionY="-27" width="128" height="104"/>
+    </elements>
+</model>

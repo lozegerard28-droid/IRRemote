@@ -1,0 +1,46 @@
+{
+  "version": "1.0",
+  "name": "Bleu Nuit",
+  "author": "IR Remote",
+  "description": "Thème sombre aux accents dorés",
+  "colors": {
+    "primary": "#FFD700",
+    "secondary": "#4A90D9",
+    "background": "#0A0E27",
+    "surface": "#141838",
+    "surfaceElevated": "#1C2150",
+    "text": "#FFFFFF",
+    "textSecondary": "#8899CC",
+    "textDisabled": "#445577",
+    "buttonBackground": "#1C2150",
+    "buttonText": "#FFFFFF",
+    "buttonPressed": "#FFD700",
+    "success": "#00C853",
+    "error": "#FF1744",
+    "warning": "#FFD600",
+    "favorite": "#FFD700",
+    "border": "#2A3060",
+    "divider": "#1A1E45"
+  },
+  "fonts": {
+    "regular": "SFProDisplay-Regular",
+    "bold": "SFProDisplay-Bold",
+    "button": "SFProRounded-Bold",
+    "size": {
+      "small": 12,
+      "medium": 16,
+      "large": 20,
+      "button": 14
+    }
+  },
+  "shapes": {
+    "buttonCornerRadius": 16,
+    "cardCornerRadius": 20,
+    "buttonBorderWidth": 1
+  },
+  "animations": {
+    "pressScale": 0.9,
+    "pressDuration": 0.15,
+    "hapticIntensity": 0.8
+  }
+}
