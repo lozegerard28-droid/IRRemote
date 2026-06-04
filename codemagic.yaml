@@ -1,0 +1,38 @@
+workflows:
+  build-ipa:
+    name: Build IRRemote IPA
+    environment:
+      xcode: 16.0
+      vars:
+        XCODE_WORKSPACE: ""
+        XCODE_SCHEME: IRRemote
+        BUNDLE_ID: com.irremote.app
+        APP_STORE_CONNECT_ISSUER_ID: ""
+        APP_STORE_CONNECT_KEY_ID: ""
+        APP_STORE_CONNECT_PRIVATE_KEY: ""
+        CERTIFICATE_PRIVATE_KEY: ""
+    scripts:
+      - name: Generate Xcode project
+        script: xcodegen generate --spec project_V2.yml
+      - name: Build IPA
+        script: |
+          xcodebuild -project IRRemote.xcodeproj \
+            -scheme "$XCODE_SCHEME" \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath build/IRRemote.xcarchive \
+            DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" \
+            PROVISIONING_PROFILE="$PROVISIONING_PROFILE" \
+            CODE_SIGN_IDENTITY="$CODE_SIGN_IDENTITY" \
+            archive | xcpretty
+          xcodebuild -exportArchive \
+            -archivePath build/IRRemote.xcarchive \
+            -exportPath build/IRRemote.ipa \
+            -exportOptionsPlist exportOptions.plist | xcpretty
+    artifacts:
+      - build/IRRemote.ipa
+      - build/*.xcarchive
+    publishing:
+      email:
+        recipients:
+          - loze.gerard28@gmail.com
