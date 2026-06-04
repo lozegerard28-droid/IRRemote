@@ -17,7 +17,7 @@ workflows:
           echo "--- 3. Generate Xcode project ---"
           xcodegen generate --spec project_V2.yml 2>&1
           echo "--- 4. Verify .xcodeproj ---"
-          PROJ=$(ls *.xcodeproj 2>/dev/null | head -1)
+          PROJ=$(ls -d *.xcodeproj 2>/dev/null | head -1)
           echo "Project file: $PROJ"
           if [ -z "$PROJ" ]; then echo "NO XCODEPROJ"; exit 1; fi
           echo "--- 5. Build ---"
