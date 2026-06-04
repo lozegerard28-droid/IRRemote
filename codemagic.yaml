@@ -13,7 +13,8 @@ workflows:
         script: xcodegen generate --spec project_V2.yml
       - name: Build IPA
         script: |
-          xcodebuild build -project IRRemote.xcodeproj \
+          set -e
+          xcodebuild clean build -project IRRemote.xcodeproj \
             -scheme "$XCODE_SCHEME" \
             -sdk iphoneos \
             -configuration Release \
@@ -21,10 +22,15 @@ workflows:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            | xcpretty
+            2>&1 | tail -50
+          echo "--- Searching for .app ---"
+          APP_PATH=$(find $CM_BUILD_DIR/build/derived -name "*.app" -type d | head -1)
+          echo "App found at: $APP_PATH"
+          if [ -z "$APP_PATH" ]; then echo "ERROR: No .app found!"; exit 1; fi
           mkdir -p $CM_BUILD_DIR/build/ipa/Payload
-          cp -r $CM_BUILD_DIR/build/derived/Build/Products/Release-iphoneos/IRRemote.app $CM_BUILD_DIR/build/ipa/Payload/
+          cp -r "$APP_PATH" $CM_BUILD_DIR/build/ipa/Payload/
           cd $CM_BUILD_DIR/build/ipa
           zip -r $CM_BUILD_DIR/build/IRRemote.ipa Payload/
+          echo "IPA size: $(wc -c < $CM_BUILD_DIR/build/IRRemote.ipa) bytes"
     artifacts:
       - build/IRRemote.ipa
