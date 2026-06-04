@@ -8,9 +8,20 @@ workflows:
         BUNDLE_ID: com.irremote.app
     scripts:
       - name: Install xcodegen
-        script: HOMEBREW_NO_AUTO_UPDATE=1 brew install xcodegen
+        script: |
+          echo "--- Installing xcodegen ---"
+          brew install --quiet xcodegen 2>&1 || { \
+            echo "brew failed, trying direct download..."; \
+            curl -sL "https://github.com/YonasKolb/xcodegen/releases/download/2.43.1/xcodegen.zip" -o /tmp/xcodegen.zip; \
+            unzip -q /tmp/xcodegen.zip -d /tmp/xcodegen; \
+            export PATH="/tmp/xcodegen:$PATH"; \
+          }
+          which xcodegen || echo "xcodegen still not found"
       - name: Generate Xcode project
-        script: xcodegen generate --spec project_V2.yml
+        script: |
+          echo "--- Generating project ---"
+          xcodegen generate --spec project_V2.yml 2>&1 || { echo "xcodegen failed"; ls -la; exit 1; }
+          ls -la *.xcodeproj 2>/dev/null || echo "NO .xcodeproj GENERATED"
       - name: Build IPA
         script: |
           set -e
