@@ -26,7 +26,6 @@ targets:
           - "Helpers/AppError.swift"
       - path: Models
         excludes:
-          - "CoreData/IRRemote.xcdatamodeld/IRRemote.xcdatamodel"
           - "CoreData/Remote+CoreDataProperties.swift"
           - "CoreData/PersistenceController.swift"
       - path: Services

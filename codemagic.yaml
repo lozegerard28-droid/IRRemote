@@ -7,21 +7,39 @@ workflows:
         XCODE_SCHEME: IRRemote
         BUNDLE_ID: com.irremote.app
     scripts:
-      - name: Install xcodegen
+      - name: Build IPA
         script: |
-          echo "--- Installing xcodegen ---"
-          brew install --quiet xcodegen 2>&1 || { \
-            echo "brew failed, trying direct download..."; \
-            curl -sL "https://github.com/YonasKolb/xcodegen/releases/download/2.43.1/xcodegen.zip" -o /tmp/xcodegen.zip; \
-            unzip -q /tmp/xcodegen.zip -d /tmp/xcodegen; \
-            export PATH="/tmp/xcodegen:$PATH"; \
-          }
-          which xcodegen || echo "xcodegen still not found"
-      - name: Generate Xcode project
-        script: |
-          echo "--- Generating project ---"
-          xcodegen generate --spec project_V2.yml 2>&1 || { echo "xcodegen failed"; ls -la; exit 1; }
-          ls -la *.xcodeproj 2>/dev/null || echo "NO .xcodeproj GENERATED"
+          set -e
+          echo "--- 1. Install xcodegen ---"
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install xcodegen 2>&1
+          echo "--- 2. Verify xcodegen ---"
+          command -v xcodegen || { echo "xcodegen not in PATH, searching..."; find / -name xcodegen -type f 2>/dev/null; exit 1; }
+          echo "--- 3. Generate Xcode project ---"
+          xcodegen generate --spec project_V2.yml 2>&1
+          echo "--- 4. Verify .xcodeproj ---"
+          PROJ=$(ls *.xcodeproj 2>/dev/null | head -1)
+          echo "Project file: $PROJ"
+          if [ -z "$PROJ" ]; then echo "NO XCODEPROJ"; exit 1; fi
+          echo "--- 5. Build ---"
+          xcodebuild clean build -project "$PROJ" \
+            -scheme "$XCODE_SCHEME" \
+            -sdk iphoneos \
+            -configuration Release \
+            -derivedDataPath $CM_BUILD_DIR/build/derived \
+            -destination generic/platform=iOS \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tail -100
+          echo "--- 6. Package IPA ---"
+          APP_PATH=$(find $CM_BUILD_DIR/build/derived -name "*.app" -type d | head -1)
+          echo "App found at: $APP_PATH"
+          if [ -z "$APP_PATH" ]; then echo "ERROR: No .app found!"; exit 1; fi
+          mkdir -p $CM_BUILD_DIR/build/ipa/Payload
+          cp -r "$APP_PATH" $CM_BUILD_DIR/build/ipa/Payload/
+          cd $CM_BUILD_DIR/build/ipa
+          zip -r $CM_BUILD_DIR/build/IRRemote.ipa Payload/
+          echo "IPA size: $(wc -c < $CM_BUILD_DIR/build/IRRemote.ipa) bytes"
       - name: Build IPA
         script: |
           set -e
