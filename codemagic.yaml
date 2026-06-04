@@ -8,7 +8,7 @@ workflows:
         BUNDLE_ID: com.irremote.app
     scripts:
       - name: Install xcodegen
-        script: brew install xcodegen
+        script: HOMEBREW_NO_AUTO_UPDATE=1 brew install xcodegen
       - name: Generate Xcode project
         script: xcodegen generate --spec project_V2.yml
       - name: Build IPA
