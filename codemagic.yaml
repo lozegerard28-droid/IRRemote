@@ -2,37 +2,28 @@ workflows:
   build-ipa:
     name: Build IRRemote IPA
     environment:
-      xcode: 16.0
+      xcode: "16.0"
       vars:
-        XCODE_WORKSPACE: ""
         XCODE_SCHEME: IRRemote
         BUNDLE_ID: com.irremote.app
-        APP_STORE_CONNECT_ISSUER_ID: ""
-        APP_STORE_CONNECT_KEY_ID: ""
-        APP_STORE_CONNECT_PRIVATE_KEY: ""
-        CERTIFICATE_PRIVATE_KEY: ""
     scripts:
       - name: Generate Xcode project
         script: xcodegen generate --spec project_V2.yml
       - name: Build IPA
         script: |
-          xcodebuild -project IRRemote.xcodeproj \
+          xcodebuild build -project IRRemote.xcodeproj \
             -scheme "$XCODE_SCHEME" \
             -sdk iphoneos \
             -configuration Release \
-            -archivePath build/IRRemote.xcarchive \
-            DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" \
-            PROVISIONING_PROFILE="$PROVISIONING_PROFILE" \
-            CODE_SIGN_IDENTITY="$CODE_SIGN_IDENTITY" \
-            archive | xcpretty
-          xcodebuild -exportArchive \
-            -archivePath build/IRRemote.xcarchive \
-            -exportPath build/IRRemote.ipa \
-            -exportOptionsPlist exportOptions.plist | xcpretty
+            -archivePath $CM_BUILD_DIR/build/IRRemote.xcarchive \
+            -derivedDataPath $CM_BUILD_DIR/build/derived \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty
+          mkdir -p $CM_BUILD_DIR/build/ipa/Payload
+          cp -r $CM_BUILD_DIR/build/derived/Build/Products/Release-iphoneos/IRRemote.app $CM_BUILD_DIR/build/ipa/Payload/
+          cd $CM_BUILD_DIR/build/ipa
+          zip -r $CM_BUILD_DIR/build/IRRemote.ipa Payload/
     artifacts:
       - build/IRRemote.ipa
-      - build/*.xcarchive
-    publishing:
-      email:
-        recipients:
-          - loze.gerard28@gmail.com
