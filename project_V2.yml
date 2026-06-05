@@ -26,7 +26,9 @@ targets:
           - "Helpers/AppError.swift"
       - path: Models
         excludes:
+          - "CoreData/Remote+CoreDataClass.swift"
           - "CoreData/Remote+CoreDataProperties.swift"
+          - "CoreData/Remote+CoreDataProperties_V2.swift"
           - "CoreData/PersistenceController.swift"
       - path: Services
         excludes:
