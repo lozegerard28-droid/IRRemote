@@ -34,6 +34,14 @@ targets:
         excludes:
           - "CoreData/Remote+CoreDataClass.swift"
           - "CoreData/Remote+CoreDataProperties.swift"
+          - "CoreData/Remote+CoreDataProperties_V2.swift"
+          - "CoreData/Remote.swift"
+          - "CoreData/Button.swift"
+          - "CoreData/HistoryEvent.swift"
+          - "CoreData/Room.swift"
+          - "CoreData/Scenario.swift"
+          - "CoreData/ScenarioStep.swift"
+          - "CoreData/Theme.swift"
           - "CoreData/PersistenceController.swift"
       - path: Services
         excludes:
