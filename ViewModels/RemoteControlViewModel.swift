@@ -37,10 +37,18 @@ final class RemoteControlViewModel: ObservableObject {
                     remoteName: remote?.name ?? "",
                     buttonName: button.name,
                     irCode: button.irCode,
-                    roomName: remote?.room?.name,
+                    success: true,
                     context: PersistenceController.shared.viewContext
                 )
             } catch {
+                Logger.ir.error("Send failed: \(error.localizedDescription)")
+                HistoryService.shared.recordEvent(
+                    remoteName: remote?.name ?? "",
+                    buttonName: button.name,
+                    irCode: button.irCode,
+                    success: false,
+                    context: PersistenceController.shared.viewContext
+                )
                 Logger.ir.error("Send failed: \(error.localizedDescription)")
             }
         }
