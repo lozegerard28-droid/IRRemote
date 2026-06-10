@@ -2,7 +2,7 @@ name: Build IRRemote IPA
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
