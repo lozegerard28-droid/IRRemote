@@ -1,12 +1,10 @@
 import Foundation
 
-class JSONImportService: Importable {
-    typealias ResultType = RemoteDTO
-    var supportedExtensions: [String] { ["json", "irremote"] }
-    
-    func importFile(url: URL) async throws -> RemoteDTO {
-        let data = try Data(contentsOf: url)
-        let decoder = JSONDecoder()
-        return try decoder.decode(RemoteDTO.self, from: data)
+final class JSONImportService {
+    static let shared = JSONImportService()
+    private let parser = JSONParser()
+
+    func importFrom(url: URL) async throws -> RemoteDTO {
+        try await parser.parse(url: url)
     }
 }

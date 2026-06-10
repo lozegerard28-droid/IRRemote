@@ -1,31 +1,23 @@
 import Foundation
 
-class IRReceiverService: IRReceivable {
+actor IRReceiverService {
     static let shared = IRReceiverService()
-    private var isReceiving = false
-    
-    func startReceiving() -> AsyncStream<ReceivedIRCode> {
-        AsyncStream { continuation in
-            isReceiving = true
-            Task {
-                while isReceiving {
-                    if let code = await listenForIR() {
-                        continuation.yield(code)
-                    }
-                    try? await Task.sleep(nanoseconds: 50_000_000)
-                }
-                continuation.finish()
-            }
+
+    private var activeDongle: IRTransmittable?
+    private var receiveTask: Task<Void, Never>?
+
+    func setDongle(_ dongle: IRTransmittable) {
+        activeDongle = dongle
+    }
+
+    func startReceiving() -> AsyncStream<String> {
+        guard let dongle = activeDongle else {
+            return AsyncStream { $0.finish() }
         }
+        return dongle.startReceiving()
     }
-    
+
     func stopReceiving() {
-        isReceiving = false
-    }
-    
-    private func listenForIR() async -> ReceivedIRCode? {
-        // Hardware-specific reception
-        try? await Task.sleep(nanoseconds: 100_000_000)
-        return nil
+        activeDongle?.stopReceiving()
     }
 }

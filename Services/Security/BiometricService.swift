@@ -1,26 +1,42 @@
 import Foundation
 import LocalAuthentication
 
-class BiometricService: BiometricAuthenticatable {
+final class BiometricService {
     static let shared = BiometricService()
-    private let context = LAContext()
-    
-    var isAvailable: Bool {
-        context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
-    }
-    
-    var biometryType: LABiometryType {
-        context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+
+    var biometricType: LABiometryType {
+        let context = LAContext()
+        var error: NSError?
+        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+            return .none
+        }
         return context.biometryType
     }
-    
-    func authenticate(reason: String) async throws -> Bool {
-        guard isAvailable else { throw AppError.biometricUnavailable }
+
+    var isAvailable: Bool {
+        let context = LAContext()
+        var error: NSError?
+        return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+    }
+
+    func authenticate(reason: String = "Unlock protected content") async throws -> Bool {
+        let context = LAContext()
+        var error: NSError?
+
+        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+            throw AppError.biometricUnavailable
+        }
+
         return try await withCheckedThrowingContinuation { continuation in
             context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
-                                  localizedReason: reason) { success, error in
-                if success { continuation.resume(returning: true) }
-                else { continuation.resume(throwing: error ?? AppError.authenticationFailed) }
+                                   localizedReason: reason) { success, error in
+                if success {
+                    continuation.resume(returning: true)
+                } else if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(throwing: AppError.authenticationFailed)
+                }
             }
         }
     }

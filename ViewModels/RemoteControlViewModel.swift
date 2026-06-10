@@ -1,63 +1,83 @@
 import SwiftUI
 import Combine
 
-class RemoteControlViewModel: ObservableObject {
-    @Published var currentRemote: Remote?
-    @Published var buttons: [Button] = []
+@MainActor
+final class RemoteControlViewModel: ObservableObject {
+    @Published var remote: Remote?
     @Published var isSending = false
-    @Published var lastSentCode: String?
-    @Published var orientation: UIDeviceOrientation = .portrait
+    @Published var isLandscape = false
+    @Published var isLocked = false
+    @Published var showEdit = false
+    @Published var lastSentButton: String?
 
-    private let irService = IRTransmitterService.shared
-    private let hapticService = HapticService.shared
-    private let flashService = FlashService.shared
-    private let historyService = HistoryService.shared
-    private var cancellables = Set<AnyCancellable>()
+    private var repeatTask: Task<Void, Never>?
 
     func loadRemote(_ remote: Remote) {
-        currentRemote = remote
-        if let buttonsSet = remote.buttons {
-            buttons = buttonsSet.sorted { $0.sortOrder < $1.sortOrder }
-        }
+        self.remote = remote
+        isLocked = remote?.room?.isLocked ?? false
     }
 
-    func sendCommand(button: Button) async {
+    func sendIR(button: Button) {
         guard !isSending else { return }
         isSending = true
-        defer { isSending = false }
+        lastSentButton = button.name
 
-        let code = button.irCode
-        let proto = IRProtocol(rawValue: button.protocolType ?? "NEC") ?? .nec
-        let bits = button.bitCount
+        HapticService.shared.play()
+        FlashService.shared.flash()
+        AudioService.shared.play()
 
-        await MainActor.run { hapticService.playPressFeedback() }
-
-        do {
-            try await irService.send(code: code, protocolType: proto, bits: Int(bits))
-            await MainActor.run {
-                lastSentCode = code
-                flashService.flash()
-                historyService.recordEvent(
-                    remoteName: currentRemote?.name ?? "",
-                    buttonName: button.name,
-                    irCode: code,
-                    success: true
-                )
+        Task {
+            defer {
+                isSending = false
             }
-        } catch {
-            await MainActor.run {
-                hapticService.playErrorFeedback()
-                historyService.recordEvent(
-                    remoteName: currentRemote?.name ?? "",
+            do {
+                let proto = ProtocolType(rawValue: button.irProtocol ?? "NEC") ?? .nec
+                try await IRTransmitterService.shared.send(code: button.irCode, protocol: proto)
+                HistoryService.shared.recordEvent(
+                    remoteName: remote?.name ?? "",
                     buttonName: button.name,
-                    irCode: code,
-                    success: false
+                    irCode: button.irCode,
+                    roomName: remote?.room?.name,
+                    context: PersistenceController.shared.viewContext
                 )
+            } catch {
+                Logger.ir.error("Send failed: \(error.localizedDescription)")
             }
         }
     }
 
-    func toggleOrientation() {
-        orientation = orientation == .portrait ? .landscapeRight : .portrait
+    func startRepeat(button: Button) {
+        let interval = PreferencesManager.shared.repeatDelay > 0 ? PreferencesManager.shared.repeatDelay : 0.3
+        repeatTask = Task {
+            while !Task.isCancelled {
+                sendIR(button: button)
+                try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
+            }
+        }
+    }
+
+    func stopRepeat() {
+        repeatTask?.cancel()
+        repeatTask = nil
+    }
+
+    func toggleFavorite() {
+        guard let remote = remote else { return }
+        remote.isFavorite.toggle()
+        PersistenceController.shared.save()
+    }
+
+    func authenticateIfNeeded() async {
+        guard isLocked else { return }
+        do {
+            let success = try await BiometricService.shared.authenticate()
+            if success { isLocked = false }
+        } catch {
+            Logger.security.error("Auth failed: \(error.localizedDescription)")
+        }
+    }
+
+    deinit {
+        repeatTask?.cancel()
     }
 }

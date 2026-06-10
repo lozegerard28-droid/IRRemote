@@ -1,24 +1,26 @@
+import UIKit
 import AVFoundation
 
-class AudioService: AudioPlayable {
+final class AudioService {
     static let shared = AudioService()
-    private var player: AVAudioPlayer?
-    
-    func playSendSound() {
-        playSound(named: "click")
+
+    private var isEnabled = false
+    private var soundID: SystemSoundID = 0
+
+    func setEnabled(_ enabled: Bool) {
+        isEnabled = enabled
     }
-    
-    func playSuccessSound() {
-        playSound(named: "success")
+
+    func setSound(_ url: URL) {
+        AudioServicesCreateSystemSoundID(url as CFURL, &soundID)
     }
-    
-    func playErrorSound() {
-        playSound(named: "error")
-    }
-    
-    private func playSound(named: String) {
-        guard let url = Bundle.main.url(forResource: named, withExtension: "wav") else { return }
-        player = try? AVAudioPlayer(contentsOf: url)
-        player?.play()
+
+    func play() {
+        guard isEnabled else { return }
+        if soundID != 0 {
+            AudioServicesPlaySystemSound(soundID)
+        } else {
+            AudioServicesPlaySystemSound(1104)
+        }
     }
 }

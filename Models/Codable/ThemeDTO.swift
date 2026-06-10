@@ -4,44 +4,43 @@ struct ThemeDTO: Codable {
     let version: String
     let name: String
     let author: String?
-    let description: String?
-    let colors: ThemeColorsDTO
-    let fonts: ThemeFontsDTO
-    let shapes: ThemeShapesDTO
-    let animations: ThemeAnimationsDTO
-}
+    let colors: ThemeColors
+    let fonts: ThemeFonts?
+    let shapes: ThemeShapes?
+    let animations: ThemeAnimations?
 
-struct ThemeColorsDTO: Codable {
-    let primary, secondary, background, surface: String
-    let surfaceElevated, text, textSecondary, textDisabled: String
-    let buttonBackground, buttonText, buttonPressed: String
-    let success, error, warning, favorite: String
-    let border, divider: String
-    
-    enum CodingKeys: String, CodingKey {
-        case primary, secondary, background, surface
-        case surfaceElevated, text, textSecondary, textDisabled
-        case buttonBackground, buttonText, buttonPressed
-        case success, error, warning, favorite
-        case border, divider
+    struct ThemeColors: Codable {
+        let primary: String
+        let background: String
+        let surface: String
+        let text: String
+        let buttonBackground: String
+        let buttonText: String
+        let buttonPressed: String
+        let success: String
+        let error: String
+        let favorite: String
     }
-}
 
-struct ThemeFontsDTO: Codable {
-    let regular, bold, button: String
-    let size: FontSizesDTO
-}
+    struct ThemeFonts: Codable {
+        let regular: String
+        let bold: String
+        let size: FontSize?
 
-struct FontSizesDTO: Codable {
-    let small, medium, large, button: Double
-}
+        struct FontSize: Codable {
+            let small: CGFloat
+            let medium: CGFloat
+            let large: CGFloat
+        }
+    }
 
-struct ThemeShapesDTO: Codable {
-    let buttonCornerRadius, cardCornerRadius: Double
-    let buttonBorderWidth: Double
-}
+    struct ThemeShapes: Codable {
+        let buttonCornerRadius: CGFloat?
+        let cardCornerRadius: CGFloat?
+    }
 
-struct ThemeAnimationsDTO: Codable {
-    let pressScale, pressDuration: Double
-    let hapticIntensity: Float
+    struct ThemeAnimations: Codable {
+        let pressScale: Double?
+        let pressDuration: Double?
+    }
 }

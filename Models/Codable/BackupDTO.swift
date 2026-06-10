@@ -1,54 +1,37 @@
 ﻿import Foundation
 
 struct BackupDTO: Codable {
-    let version: String
-    let createdAt: String
-    let appVersion: String
-    let deviceName: String?
-    let remotes: [RemoteDTO]
-    let rooms: [RoomDTO]
-    let scenarios: [ScenarioDTO]
-    let history: [HistoryEventDTO]?
-    let settings: SettingsDTO?
-}
+    let manifest: Manifest
+    let remotes: [RemoteDTO.RemoteContent]?
+    let rooms: [RoomDTO]?
+    let scenarios: [ScenarioDTO]?
+    let settings: [String: String]?
 
-struct RoomDTO: Codable {
-    let id: String
-    let name: String
-    let icon: String?
-    let sortOrder: Int16
-    let isLocked: Bool
-    let remoteIDs: [String]
-}
+    struct Manifest: Codable {
+        let version: String
+        let exportedAt: Date
+        let appVersion: String
+        let entityCount: Int
+    }
 
-struct ScenarioDTO: Codable {
-    let id: String
-    let name: String
-    let icon: String?
-    let steps: [ScenarioStepDTO]
-}
+    struct RoomDTO: Codable {
+        let name: String
+        let icon: String
+        let sortOrder: Int
+        let isLocked: Bool
+    }
 
-struct ScenarioStepDTO: Codable {
-    let remoteID: String
-    let buttonID: String
-    let delay: Double
-    let sortOrder: Int16
-}
+    struct ScenarioDTO: Codable {
+        let name: String
+        let icon: String
+        let isFavorite: Bool
+        let steps: [ScenarioStepDTO]
+    }
 
-struct HistoryEventDTO: Codable {
-    let timestamp: String
-    let remoteName: String
-    let buttonName: String
-    let irCode: String
-    let success: Bool
-}
-
-struct SettingsDTO: Codable {
-    let themeName: String?
-    let hapticIntensity: String?
-    let flashEnabled: Bool?
-    let soundEnabled: Bool?
-    let buttonLayout: String?
-    let lockDelay: Int?
-    let language: String?
+    struct ScenarioStepDTO: Codable {
+        let remoteName: String
+        let buttonName: String
+        let delay: Double
+        let sortOrder: Int
+    }
 }

@@ -1,60 +1,82 @@
 import Foundation
 import CoreData
 
-class HistoryService: Historiable {
+final class HistoryService {
     static let shared = HistoryService()
-    private let maxEvents = 500
-    
-    func recordEvent(remoteName: String, buttonName: String, irCode: String, success: Bool) {
-        let event = HistoryEvent(context: PersistenceController.shared.container.viewContext)
+
+    private let maxEntries = 500
+
+    func recordEvent(remoteName: String, buttonName: String, irCode: String, roomName: String?, context: NSManagedObjectContext) {
+        let event = HistoryEvent(context: context)
         event.id = UUID()
         event.timestamp = Date()
         event.remoteName = remoteName
         event.buttonName = buttonName
         event.irCode = irCode
-        event.success = success
+        event.roomName = roomName
+
         PersistenceController.shared.save()
-        trimHistory()
+        trimHistory(context: context)
     }
-    
-    func getRecentEvents(limit: Int = 50) -> [HistoryEvent] {
-        let request = HistoryEvent.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
-        request.fetchLimit = limit
-        return (try? PersistenceController.shared.container.viewContext.fetch(request)) ?? []
+
+    func fetchRecent(context: NSManagedObjectContext, limit: Int = 100) -> [HistoryEvent] {
+        let fetch = NSFetchRequest<HistoryEvent>(entityName: "HistoryEvent")
+        fetch.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        fetch.fetchLimit = limit
+        return (try? context.fetch(fetch)) ?? []
     }
-    
-    func getEvents(filter: HistoryFilter) -> [HistoryEvent] {
-        let request = HistoryEvent.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+
+    func fetchFiltered(context: NSManagedObjectContext, remoteName: String? = nil, roomName: String? = nil) -> [HistoryEvent] {
+        let fetch = NSFetchRequest<HistoryEvent>(entityName: "HistoryEvent")
+        fetch.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+
         var predicates: [NSPredicate] = []
-        if let name = filter.remoteName { predicates.append(NSPredicate(format: "remoteName == %@", name)) }
-        if let start = filter.startDate { predicates.append(NSPredicate(format: "timestamp >= %@", start as NSDate)) }
-        if let end = filter.endDate { predicates.append(NSPredicate(format: "timestamp <= %@", end as NSDate)) }
-        if filter.successOnly == true { predicates.append(NSPredicate(format: "success == YES")) }
-        request.predicate = predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
-        return (try? PersistenceController.shared.container.viewContext.fetch(request)) ?? []
+        if let remoteName = remoteName {
+            predicates.append(NSPredicate(format: "remoteName == %@", remoteName))
+        }
+        if let roomName = roomName {
+            predicates.append(NSPredicate(format: "roomName == %@", roomName))
+        }
+        if !predicates.isEmpty {
+            fetch.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+        }
+
+        return (try? context.fetch(fetch)) ?? []
     }
-    
-    func clearAll() {
-        let context = PersistenceController.shared.container.viewContext
-        let request = HistoryEvent.fetchRequest()
-        let delete = NSBatchDeleteRequest(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+
+    func clearAll(context: NSManagedObjectContext) {
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "HistoryEvent")
+        let delete = NSBatchDeleteRequest(fetchRequest: fetch)
         try? context.execute(delete)
         PersistenceController.shared.save()
     }
-    
-    private func trimHistory() {
-        let context = PersistenceController.shared.container.viewContext
-        let request = HistoryEvent.fetchRequest()
-        let count = (try? context.count(for: request)) ?? 0
-        if count > maxEvents {
-            request.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: true)]
-            request.fetchLimit = count - maxEvents
-            if let old = try? context.fetch(request) {
-                old.forEach { context.delete($0) }
-                PersistenceController.shared.save()
-            }
+
+    func exportToCSV(context: NSManagedObjectContext) -> URL {
+        let events = fetchRecent(context: context, limit: maxEntries)
+        var csv = "Date,Heure,Télécommande,Bouton,Code IR,Pièce\n"
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd,HH:mm:ss"
+
+        for event in events {
+            let dateStr = formatter.string(from: event.timestamp)
+            let room = event.roomName ?? ""
+            csv += "\(dateStr),\(event.remoteName),\(event.buttonName),\(event.irCode),\(room)\n"
         }
+
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("IRRemote_History.csv")
+        try? csv.write(to: url, atomically: true, encoding: .utf8)
+        return url
+    }
+
+    private func trimHistory(context: NSManagedObjectContext) {
+        let fetch = NSFetchRequest<HistoryEvent>(entityName: "HistoryEvent")
+        fetch.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        guard let events = try? context.fetch(fetch), events.count > maxEntries else { return }
+
+        let toDelete = events.suffix(events.count - maxEntries)
+        for event in toDelete {
+            context.delete(event)
+        }
+        PersistenceController.shared.save()
     }
 }

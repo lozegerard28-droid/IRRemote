@@ -1,45 +1,38 @@
 import SwiftUI
 
-class SettingsViewModel: ObservableObject {
-    @Published var themeMode: ThemeMode = .system
-    @Published var hapticIntensity: HapticIntensity = .medium
-    @Published var flashEnabled = false
-    @Published var soundEnabled = false
-    @Published var buttonLayout: String = "3x3"
-    @Published var language: Language = .french
-    @Published var lockDelay: Int = 1
+@MainActor
+final class SettingsViewModel: ObservableObject {
+    @Published var preferences = PreferencesManager.shared
+    @Published var themeManager = ThemeManager.shared
+    @Published var showResetConfirmation = false
+    @Published var showOnboarding = false
 
-    @Published var isExporting = false
-    @Published var showResetAlert = false
-
-    let appVersion = "1.0.0"
-    let dataVersion = "1.0"
-
-    func exportBackup() async {
-        isExporting = true
-        defer { isExporting = false }
-        do {
-            let url = try await BackupService.shared.createBackup(includeHistory: true)
-            await MainActor.run {
-                let av = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-                if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let root = scene.windows.first?.rootViewController {
-                    root.present(av, animated: true)
-                }
-            }
-        } catch {
-            AppLogger.error("Export failed: \(error)", category: AppLogger.core)
-        }
-    }
-
-    func resetAllData() {
+    func resetApp() {
+        preferences.resetAll()
         let context = PersistenceController.shared.viewContext
-        let entities = ["Remote", "Button", "Room", "Scenario", "ScenarioStep", "HistoryEvent"]
+        let entities = ["Remote", "Button", "Room", "Scenario", "ScenarioStep", "HistoryEvent", "ThemeEntity"]
         for entity in entities {
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
-            let delete = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+            let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
+            let delete = NSBatchDeleteRequest(fetchRequest: fetch)
             try? context.execute(delete)
         }
-        PersistenceController.shared.save()
+        try? context.save()
+        Logger.app.info("App reset completed")
+    }
+
+    func exportBackup() -> URL? {
+        try? BackupService.shared.createBackup(context: PersistenceController.shared.viewContext)
+    }
+
+    func importBackup(url: URL) {
+        try? BackupService.shared.restoreBackup(url: url, context: PersistenceController.shared.viewContext)
+    }
+
+    func exportHistory() -> URL {
+        HistoryService.shared.exportToCSV(context: PersistenceController.shared.viewContext)
+    }
+
+    func clearHistory() {
+        HistoryService.shared.clearAll(context: PersistenceController.shared.viewContext)
     }
 }

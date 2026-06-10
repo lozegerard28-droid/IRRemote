@@ -1,23 +1,41 @@
 import UIKit
 
-class HapticService: HapticFeedable {
+final class HapticService {
     static let shared = HapticService()
-    var intensity: Float = 0.7
-    
-    func playPressFeedback(intensity: Float = 0.7) {
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred(intensity: intensity)
+
+    enum Intensity {
+        case light, medium, strong, off
     }
-    
-    func playSuccessFeedback() {
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
+
+    private var intensity: Intensity = .medium
+
+    func setIntensity(_ intensity: Intensity) {
+        self.intensity = intensity
     }
-    
-    func playErrorFeedback() {
-        UINotificationFeedbackGenerator().notificationOccurred(.error)
+
+    func play() {
+        guard intensity != .off else { return }
+        let feedback: UIImpactFeedbackGenerator.FeedbackStyle
+        switch intensity {
+        case .light: feedback = .light
+        case .medium: feedback = .medium
+        case .strong: feedback = .heavy
+        case .off: return
+        }
+        let generator = UIImpactFeedbackGenerator(style: feedback)
+        generator.prepare()
+        generator.impactOccurred()
     }
-    
-    func playLightPress() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+
+    func playSuccess() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        generator.notificationOccurred(.success)
+    }
+
+    func playError() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        generator.notificationOccurred(.error)
     }
 }

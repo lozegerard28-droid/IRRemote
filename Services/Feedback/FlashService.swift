@@ -1,28 +1,26 @@
+import UIKit
 import AVFoundation
 
-class FlashService: FlashLightable {
+final class FlashService {
     static let shared = FlashService()
-    
-    var isAvailable: Bool {
-        guard let device = AVCaptureDevice.default(for: .video) else { return false }
-        return device.hasTorch
+
+    private var isEnabled = false
+
+    func setEnabled(_ enabled: Bool) {
+        isEnabled = enabled
     }
-    
-    func flash(duration: TimeInterval = 0.1) {
-        guard isAvailable else { return }
-        guard let device = AVCaptureDevice.default(for: .video) else { return }
-        try? device.lockForConfiguration()
-        device.torchMode = .on
-        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-            device.torchMode = .off
-            device.unlockForConfiguration()
+
+    func flash() {
+        guard isEnabled, let device = AVCaptureDevice.default(for: .video), device.hasTorch else { return }
+        do {
+            try device.lockForConfiguration()
+            device.torchMode = .on
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                device.torchMode = .off
+                device.unlockForConfiguration()
+            }
+        } catch {
+            Logger.app.error("Flash error: \(error.localizedDescription)")
         }
-    }
-    
-    func stopFlashing() {
-        guard let device = AVCaptureDevice.default(for: .video) else { return }
-        try? device.lockForConfiguration()
-        device.torchMode = .off
-        device.unlockForConfiguration()
     }
 }

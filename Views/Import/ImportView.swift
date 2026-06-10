@@ -3,90 +3,121 @@ import UniformTypeIdentifiers
 
 struct ImportView: View {
     @StateObject private var viewModel = ImportViewModel()
-    @State private var showFilePicker = false
-    @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var themeManager: ThemeManager
-    
+    @Environment(\.dismiss) private var dismiss
+    @State private var showCSVPicker = false
+    @State private var showJSONPicker = false
+
     var body: some View {
-        NavigationView {
-            VStack(spacing: 24) {
+        NavigationStack {
+            VStack(spacing: 20) {
                 if viewModel.isImporting {
                     ProgressView("Import en cours...")
-                } else if viewModel.showNameDialog, let result = viewModel.importResult {
-                    importNameDialog(result)
+                } else if viewModel.showPreview {
+                    previewContent
                 } else {
                     importOptions
                 }
             }
-            .padding()
-            .navigationTitle("Ajouter")
-            .toolbar { ToolbarItem(placement: .navigationBarTrailing) { Button("Fermer") { presentationMode.wrappedValue.dismiss() } } }
-            .alert("Erreur", isPresented: Binding<Bool>(
-                get: { viewModel.importError != nil },
-                set: { if !$0 { viewModel.importError = nil } }
+            .navigationTitle("Importer")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Annuler") { dismiss() }
+                }
+            }
+            .alert("Erreur", isPresented: .init(
+                get: { viewModel.errorMessage != nil },
+                set: { if !$0 { viewModel.errorMessage = nil } }
             )) {
-                Button("OK") { viewModel.importError = nil }
-            } message: { Text(viewModel.importError ?? "") }
-        }
-    }
-    
-    private var importOptions: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "plus.circle").font(.system(size: 50)).foregroundColor(themeManager.currentTheme.colors.primary)
-            Text("Ajouter une télécommande").font(.title2).bold()
-            
-            // File import
-            Button(action: { showFilePicker = true }) {
-                Label("Importer un fichier", systemImage: "doc.badge.plus")
-                    .frame(maxWidth: .infinity).padding()
-                    .background(themeManager.currentTheme.colors.surface)
-                    .cornerRadius(12)
+                Text(viewModel.errorMessage ?? "")
             }
-            .fileImporter(isPresented: $showFilePicker, allowedContentTypes: [.commaSeparatedText, .json]) { result in
+            .fileImporter(isPresented: $showCSVPicker, allowedContentTypes: [.commaSeparatedText]) { result in
                 if case .success(let url) = result {
-                    Task { await viewModel.handleFile(url: url) }
+                    Task { await viewModel.importCSV(url: url) }
                 }
             }
-            
-            // Manual creation
-            Button(action: {}) {
-                Label("Créer manuellement", systemImage: "square.and.pencil")
-                    .frame(maxWidth: .infinity).padding()
-                    .background(themeManager.currentTheme.colors.surface)
-                    .cornerRadius(12)
-            }
-            
-            // Learning mode
-            if DongleManager.shared.isConnected {
-                Button(action: {}) {
-                    Label("Mode apprentissage", systemImage: "waveform")
-                        .frame(maxWidth: .infinity).padding()
-                        .background(themeManager.currentTheme.colors.surface)
-                        .cornerRadius(12)
+            .fileImporter(isPresented: $showJSONPicker, allowedContentTypes: [.json]) { result in
+                if case .success(let url) = result {
+                    Task { await viewModel.importJSON(url: url) }
                 }
             }
         }
+        .onAppear { viewModel.loadRooms() }
     }
-    
-    private func importNameDialog(_ result: ImportResult) -> some View {
+
+    private var importOptions: some View {
         VStack(spacing: 16) {
-            Text("\(result.buttonCount) boutons détectés").font(.headline)
-            Text("Donnez un nom à cette télécommande :").foregroundColor(.secondary)
-            TextField("Nom", text: $viewModel.remoteName).textFieldStyle(.roundedBorder)
-            
-            Picker("Pièce", selection: $viewModel.selectedRoom) {
-                Text("Aucune").tag(nil as Room?)
-                ForEach(viewModel.availableRooms, id: \.id) { room in
-                    Text(room.name).tag(room as Room?)
+            Image(systemName: "square.and.arrow.down")
+                .font(.system(size: 48))
+                .foregroundColor(.accentColor)
+
+            Text("Ajouter une télécommande")
+                .font(.title2.bold())
+
+            Button {
+                showCSVPicker.toggle()
+            } label: {
+                Label("Importer un fichier CSV", systemImage: "doc.text")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            Button {
+                showJSONPicker.toggle()
+            } label: {
+                Label("Importer un fichier JSON", systemImage: "curlybraces")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            Button {
+                viewModel.importSource = .manual
+                viewModel.showPreview = true
+            } label: {
+                Label("Créer manuellement", systemImage: "hand.tap")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+        }
+        .padding()
+    }
+
+    private var previewContent: some View {
+        Form {
+            Section("Aperçu") {
+                TextField("Nom de la télécommande", text: $viewModel.remoteName)
+
+                Picker("Pièce", selection: $viewModel.selectedRoom) {
+                    ForEach(viewModel.rooms, id: \.id) { room in
+                        Text(room.name).tag(room as Room?)
+                    }
+                }
+
+                if !viewModel.importedRows.isEmpty {
+                    ForEach(viewModel.importedRows, id: \.name) { row in
+                        HStack {
+                            Text(row.name)
+                            Spacer()
+                            Text(row.irCode)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 }
             }
-            
-            HStack(spacing: 16) {
-                Button("Annuler") { viewModel.reset() }
-                    .buttonStyle(.bordered)
-                Button("Importer") { viewModel.confirmImport(); presentationMode.wrappedValue.dismiss() }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(viewModel.remoteName.isEmpty)
+
+            Section {
+                Button("Confirmer l'import") {
+                    viewModel.confirmImport()
+                    dismiss()
+                }
+                .frame(maxWidth: .infinity)
+                .font(.headline)
             }
         }
     }

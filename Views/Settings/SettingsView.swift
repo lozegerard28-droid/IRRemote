@@ -2,123 +2,134 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
-    @EnvironmentObject var themeManager: ThemeManager
-    
-    var body: some View {
-        Form {
-            // General
-            Section("Général") {
-                Picker("Thème", selection: $viewModel.themeMode) {
-                    Text("Système").tag(ThemeMode.system)
-                    Text("Clair").tag(ThemeMode.light)
-                    Text("Sombre").tag(ThemeMode.dark)
-                }
-                Picker("Langue", selection: $viewModel.language) {
-                    Text("Français").tag(Language.french)
-                    Text("English").tag(Language.english)
-                }
-            }
-            
-            // Behavior
-            Section("Comportement") {
-                Picker("Retour haptique", selection: $viewModel.hapticIntensity) {
-                    Text("Désactivé").tag(HapticIntensity.off)
-                    Text("Faible").tag(HapticIntensity.light)
-                    Text("Moyen").tag(HapticIntensity.medium)
-                    Text("Fort").tag(HapticIntensity.strong)
-                }
-                Toggle("Flash LED à l'envoi", isOn: $viewModel.flashEnabled)
-                Toggle("Son à l'envoi", isOn: $viewModel.soundEnabled)
-            }
-            
-            // Remotes
-            Section("Télécommandes") {
-                Picker("Disposition", selection: $viewModel.buttonLayout) {
-                    Text("3 × 3").tag("3x3")
-                    Text("4 × 3").tag("4x3")
-                    Text("4 × 4").tag("4x4")
-                }
-                NavigationLink("Gérer les pièces") { RoomListView() }
-            }
-            
-            // Security
-            Section("Sécurité") {
-                NavigationLink("Verrouillage biométrique") { SecuritySettingsView() }
-            }
-            
-            // Backup
-            Section("Sauvegarde") {
-                Button(action: { Task { await viewModel.exportBackup() } }) {
-                    Label("Sauvegarder la configuration", systemImage: "square.and.arrow.up")
-                }
-            }
-            
-            // Data
-            Section("Données") {
-                Button(role: .destructive) { viewModel.showResetAlert = true } label: {
-                    Label("Réinitialiser l'application", systemImage: "trash")
-                }
-            }
-            
-            // About
-            Section("À propos") {
-                HStack { Text("Version"); Spacer(); Text(viewModel.appVersion).foregroundColor(.secondary) }
-                HStack { Text("Format de données"); Spacer(); Text(viewModel.dataVersion).foregroundColor(.secondary) }
-                NavigationLink("Crédits") { CreditsView() }
-            }
-        }
-        .navigationTitle("Paramètres")
-        .alert("Réinitialiser", isPresented: $viewModel.showResetAlert) {
-            Button("Annuler", role: .cancel) {}
-            Button("Réinitialiser", role: .destructive) { viewModel.resetAllData() }
-        } message: { Text("Toutes les données seront effacées. Cette action est irréversible.") }
-    }
-}
+    @Environment(\.dismiss) private var dismiss
+    @State private var showFilePicker = false
+    @State private var showHistoryExport = false
 
-struct CreditsView: View {
     var body: some View {
-        Form {
-            Section {
-                VStack(spacing: 8) {
-                    Image(systemName: "remote.fill").font(.system(size: 40)).foregroundColor(.blue)
-                    Text("IR Remote Controller").font(.title2).bold()
-                    Text("Application iOS de télécommande universelle").foregroundColor(.secondary)
+        NavigationStack {
+            Form {
+                generalSection
+                behaviorSection
+                remoteDefaultsSection
+                securitySection
+                backupSection
+                dataSection
+                aboutSection
+            }
+            .navigationTitle("Paramètres")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Fermer") { dismiss() }
                 }
-                .frame(maxWidth: .infinity).padding()
             }
-            Section("Développement") {
-                HStack { Text("Créateur"); Spacer(); Text("Martin").foregroundColor(.secondary) }
+            .alert("Réinitialiser l'application ?", isPresented: $viewModel.showResetConfirmation) {
+                Button("Annuler", role: .cancel) {}
+                Button("Réinitialiser", role: .destructive) { viewModel.resetApp() }
+            } message: {
+                Text("Toutes les données seront supprimées. Cette action est irréversible.")
             }
-            Section("Open Source") {
-                HStack { Text("Licence"); Spacer(); Text("MIT").foregroundColor(.secondary) }
-                HStack { Text("Dépôt"); Spacer(); Text("github.com/").foregroundColor(.blue) }
+            .fileImporter(isPresented: $showFilePicker, allowedContentTypes: [.zip]) { result in
+                if case .success(let url) = result {
+                    viewModel.importBackup(url: url)
+                }
             }
         }
-        .navigationTitle("Crédits")
     }
-}
 
-struct SecuritySettingsView: View {
-    @State private var lockedRooms: Set<String> = []
-    @State private var autoLockDelay = 1
-    
-    var body: some View {
-        Form {
-            Section {
-                Text("Les pièces verrouillées nécessitent Face ID ou Touch ID pour être ouvertes.").font(.caption).foregroundColor(.secondary)
+    private var generalSection: some View {
+        Section("Général") {
+            Picker("Langue", selection: $viewModel.preferences.language) {
+                Text("Français").tag("fr")
+                Text("English").tag("en")
             }
-            Section("Pièces verrouillées") {
-                // List rooms with toggle
+            Picker("Taille de police", selection: $viewModel.preferences.fontSize) {
+                Text("Petit").tag("Petit")
+                Text("Normal").tag("Normal")
+                Text("Grand").tag("Grand")
+                Text("Très grand").tag("Très grand")
             }
-            Section("Délai de verrouillage") {
-                Picker("Délai", selection: $autoLockDelay) {
-                    Text("Immédiat").tag(0)
-                    Text("1 min").tag(1)
-                    Text("5 min").tag(5)
-                    Text("15 min").tag(15)
-                }
+            Picker("Unité température", selection: $viewModel.preferences.temperatureUnit) {
+                Text("Celsius").tag("Celsius")
+                Text("Fahrenheit").tag("Fahrenheit")
             }
         }
-        .navigationTitle("Sécurité")
+    }
+
+    private var behaviorSection: some View {
+        Section("Comportement") {
+            Picker("Feedback haptique", selection: $viewModel.preferences.hapticIntensity) {
+                Text("Faible").tag("Faible")
+                Text("Moyen").tag("Medium")
+                Text("Fort").tag("Fort")
+                Text("Désactivé").tag("Désactivé")
+            }
+            Toggle("Son à l'envoi", isOn: $viewModel.preferences.soundEnabled)
+            Toggle("Flash LED à l'envoi", isOn: $viewModel.preferences.flashEnabled)
+            Toggle("Désactiver verrouillage auto", isOn: $viewModel.preferences.autoLockDisabled)
+        }
+    }
+
+    private var remoteDefaultsSection: some View {
+        Section("Télécommandes") {
+            Picker("Disposition par défaut", selection: $viewModel.preferences.defaultLayout) {
+                Text("3×3").tag("3x3")
+                Text("4×3").tag("4x3")
+                Text("4×4").tag("4x4")
+            }
+            Toggle("Afficher les noms", isOn: $viewModel.preferences.showButtonNames)
+            Toggle("Afficher les icônes", isOn: $viewModel.preferences.showButtonIcons)
+        }
+    }
+
+    private var securitySection: some View {
+        Section("Sécurité") {
+            Toggle("Masquer les codes IR", isOn: $viewModel.preferences.hideIRCodes)
+            Picker("Délai de verrouillage", selection: $viewModel.preferences.lockTimeout) {
+                Text("Immédiat").tag("Immédiat")
+                Text("1 min").tag("1 min")
+                Text("5 min").tag("5 min")
+                Text("15 min").tag("15 min")
+            }
+        }
+    }
+
+    private var backupSection: some View {
+        Section("Sauvegarde") {
+            Button("Sauvegarder la configuration") {
+                _ = viewModel.exportBackup()
+            }
+            Button("Restaurer une sauvegarde") {
+                showFilePicker.toggle()
+            }
+        }
+    }
+
+    private var dataSection: some View {
+        Section("Données") {
+            Button("Exporter l'historique (CSV)") {
+                _ = viewModel.exportHistory()
+                showHistoryExport = true
+            }
+            Button("Effacer l'historique") {
+                viewModel.clearHistory()
+            }
+            Button("Réinitialiser l'application", role: .destructive) {
+                viewModel.showResetConfirmation = true
+            }
+        }
+    }
+
+    private var aboutSection: some View {
+        Section("À propos") {
+            HStack {
+                Text("Version")
+                Spacer()
+                Text("1.0.0")
+                    .foregroundColor(.secondary)
+            }
+            Link("Dépôt GitHub", destination: URL(string: "https://github.com/")!)
+            Link("Site web du projet", destination: URL(string: "https://")!)
+        }
     }
 }

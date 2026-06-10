@@ -1,18 +1,13 @@
 import Foundation
 
 protocol IRTransmittable {
-    func send(code: String, protocolType: IRProtocol, bits: Int) async throws
-    func sendRaw(data: Data) async throws
-}
-
-protocol IRReceivable {
-    func startReceiving() -> AsyncStream<ReceivedIRCode>
+    var id: String { get }
+    var name: String { get }
+    var manufacturer: String { get }
+    var capabilities: DongleCapabilities { get }
+    func connect() async throws
+    func disconnect()
+    func send(code: String, protocol: ProtocolType) async throws
+    func startReceiving() -> AsyncStream<String>
     func stopReceiving()
-}
-
-struct ReceivedIRCode {
-    let code: String
-    let protocolType: IRProtocol
-    let bits: Int
-    let quality: Float
 }
