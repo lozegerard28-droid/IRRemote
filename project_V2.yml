@@ -47,11 +47,11 @@ targets:
         excludes:
           - "Backup/BackupService.swift"
           - "Feedback/FlashService.swift"
-          - "History/HistoryService.swift"
           - "Security/BiometricService.swift"
           - "IR/DongleManager.swift"
           - "Feedback/AudioService.swift"
           - "Feedback/HapticService.swift"
+          - "History/HistoryService.swift"
       - path: ViewModels
         excludes:
           - "RemoteControlViewModel.swift"

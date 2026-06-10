@@ -24,10 +24,12 @@ struct HistoryView: View {
                                 Text(event.remoteName)
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
-                                if let room = event.roomName {
-                                    Text("• \(room)")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
+                                if event.success {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                } else {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.red)
                                 }
                             }
                             Text(event.irCode)

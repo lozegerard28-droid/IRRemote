@@ -5,9 +5,8 @@ import CoreData
 final class HistoryViewModel: ObservableObject {
     @Published var events: [HistoryEvent] = []
     @Published var filterRemoteName: String?
-    @Published var filterRoomName: String?
+    @Published var filterSuccessOnly: Bool = false
     @Published var remoteNames: [String] = []
-    @Published var roomNames: [String] = []
 
     private let context = PersistenceController.shared.viewContext
 
@@ -15,7 +14,7 @@ final class HistoryViewModel: ObservableObject {
         events = HistoryService.shared.fetchFiltered(
             context: context,
             remoteName: filterRemoteName,
-            roomName: filterRoomName
+            successOnly: filterSuccessOnly
         )
     }
 
@@ -25,10 +24,7 @@ final class HistoryViewModel: ObservableObject {
         remoteFetch.resultType = .dictionaryResultType
         remoteNames = ((try? context.fetch(remoteFetch)) ?? []).compactMap { $0["name"] as? String }
 
-        let roomFetch = NSFetchRequest<NSDictionary>(entityName: "Room")
-        roomFetch.propertiesToFetch = ["name"]
-        roomFetch.resultType = .dictionaryResultType
-        roomNames = ((try? context.fetch(roomFetch)) ?? []).compactMap { $0["name"] as? String }
+
     }
 
     func clearAll() {
