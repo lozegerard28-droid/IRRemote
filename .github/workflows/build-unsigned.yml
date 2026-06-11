@@ -28,7 +28,6 @@ jobs:
           ls -la *.xcodeproj
 
       - name: Build (unsigned)
-        continue-on-error: true
         run: |
           set -x
           cd IRRemote
