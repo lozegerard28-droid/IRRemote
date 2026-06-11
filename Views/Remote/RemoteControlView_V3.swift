@@ -1,7 +1,7 @@
 import SwiftUI
 import CoreData
 
-typealias SwiftButton = SwiftUI.Button
+fileprivate typealias SwiftButton = SwiftUI.Button
 
 struct RemoteControlView: View {
     let remote: Remote
@@ -111,7 +111,7 @@ struct DongleConnectView: View {
                 }
             }
             .navigationTitle("Dongle IR")
-            .toolbar { ToolbarItem(placement: .cancellation) { SwiftButton("Annuler") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .navigationBarLeading) { SwiftButton("Annuler") { dismiss() } } }
         }
     }
 }

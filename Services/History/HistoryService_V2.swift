@@ -40,7 +40,8 @@ class HistoryService {
 
     func clearAll() {
         let context = PersistenceController.shared.container.viewContext
-        let delete = NSBatchDeleteRequest(entityName: "HistoryEvent")
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "HistoryEvent")
+        let delete = NSBatchDeleteRequest(fetchRequest: fetch)
         try? context.execute(delete)
         context.reset()
         PersistenceController.shared.save()

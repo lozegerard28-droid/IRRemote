@@ -2,7 +2,7 @@ import SwiftUI
 import CoreData
 import UniformTypeIdentifiers
 
-typealias SwiftButton = SwiftUI.Button
+fileprivate typealias SwiftButton = SwiftUI.Button
 
 struct ImportView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -122,7 +122,7 @@ struct ManualAddView: View {
                 }
             }
             .navigationTitle("Ajout manuel")
-            .toolbar { ToolbarItem(placement: .cancellation) { SwiftButton("Annuler") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .navigationBarLeading) { SwiftButton("Annuler") { dismiss() } } }
         }
     }
 
