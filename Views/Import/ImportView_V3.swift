@@ -94,6 +94,7 @@ struct ImportView: View {
                 remote.name = remoteName
                 if let p = protoIdx, cols.count > p { remote.category = cols[p] }
                 remote.createdAt = Date()
+                remote.isFavorite = false
             }
             remote.updatedAt = Date()
 
