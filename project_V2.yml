@@ -52,12 +52,14 @@ targets:
           - "Feedback/AudioService.swift"
           - "Feedback/HapticService.swift"
           - "History/HistoryService.swift"
+          - "ImportExport/ExportService.swift"
       - path: ViewModels
         excludes:
           - "RemoteControlViewModel.swift"
           - "ScenarioViewModel.swift"
           - "HomeViewModel.swift"
           - "RoomViewModel.swift"
+          - "ImportViewModel.swift"
       - path: Views
         excludes:
           - "Home/HomeView.swift"
