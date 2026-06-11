@@ -43,6 +43,7 @@ jobs:
 
       - name: Build (unsigned)
         run: |
+          set -o pipefail
           cd IRRemote
           PROJ=$(ls -d *.xcodeproj 2>/dev/null | head -1)
           echo "Project: $PROJ"
@@ -58,9 +59,11 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             2>&1 | tee build.log
-          echo "=== xcodebuild EXIT CODE: $? ==="
+          EXIT_CODE=${PIPESTATUS[0]}
+          echo "=== xcodebuild EXIT CODE: $EXIT_CODE ==="
           echo "=== LAST 80 LINES OF BUILD LOG ==="
           tail -80 build.log
+          if [ "$EXIT_CODE" -ne 0 ]; then exit $EXIT_CODE; fi
 
       - name: Package IPA
         run: |
