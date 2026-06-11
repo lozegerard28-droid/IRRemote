@@ -19,9 +19,9 @@ enum RemoteIcon: String, Codable, CaseIterable, Identifiable {
     var displayName: String {
         switch self { case .tv, .tvFill: return "TV"; case .audio, .audioFill: return "Audio"
         case .airConditioner: return "Climatisation"; case .projector, .projectorFill: return "Projecteur"
-        case .fan, .fanFill: return "Ventilateur"; case .lightbulb, .lightbulbFill: return "Lumi\u00e8re"
+        case .fan, .fanFill: return "Ventilateur"; case .lightbulb, .lightbulbFill: return "Lumi\u{00e8}re"
         case .radio, .radioFill: return "Radio"; case .speaker, .speakerFill: return "Enceinte"
-        case .antenna, .antennaRadiowaves: return "Antenne"; case .remote, .remoteFill: return "T\u00e9l\u00e9commande"
+        case .antenna, .antennaRadiowaves: return "Antenne"; case .remote, .remoteFill: return "T\u{00e9}l\u{00e9}commande"
         case .dotRadio: return "Ondes"; case .waveForm: return "Signal" }
     }
 }

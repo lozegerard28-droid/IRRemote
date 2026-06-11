@@ -7,6 +7,7 @@ final class ThemeManager: ObservableObject {
     static let shared = ThemeManager()
 
     @Published var activeTheme: ThemeDTO
+    var currentTheme: ThemeDTO { activeTheme }
     @Published var availableThemes: [ThemeDTO] = []
 
     let themeChanged = CurrentValueSubject<ThemeDTO, Never>(ThemeManager.defaultTheme)

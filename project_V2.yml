@@ -44,6 +44,9 @@ targets:
           - "CoreData/ScenarioStep.swift"
           - "CoreData/Theme.swift"
           - "CoreData/PersistenceController.swift"
+          - "Enums/AppError.swift"
+          - "Enums/AppSettings.swift"
+          - "Enums/DongleCapabilities.swift"
       - path: Services
         excludes:
           - "Backup/BackupService.swift"
