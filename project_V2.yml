@@ -61,6 +61,7 @@ targets:
           - "RoomViewModel.swift"
           - "ImportViewModel.swift"
           - "RoomListViewModel.swift"
+          - "AppState.swift"
       - path: Views
         excludes:
           - "Home/HomeView.swift"
