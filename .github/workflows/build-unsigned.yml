@@ -28,7 +28,9 @@ jobs:
           ls -la *.xcodeproj
 
       - name: Build (unsigned)
+        continue-on-error: true
         run: |
+          set -x
           cd IRRemote
           PROJ=$(ls -d *.xcodeproj 2>/dev/null | head -1)
           echo "Project: $PROJ"
@@ -41,7 +43,10 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            2>&1
+            2>&1 | tee build.log
+          echo "=== xcodebuild EXIT CODE: $? ==="
+          echo "=== LAST 80 LINES OF BUILD LOG ==="
+          tail -80 build.log
 
       - name: Package IPA
         run: |
