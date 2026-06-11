@@ -60,10 +60,12 @@ targets:
           - "HomeViewModel.swift"
           - "RoomViewModel.swift"
           - "ImportViewModel.swift"
+          - "RoomListViewModel.swift"
       - path: Views
         excludes:
           - "Home/HomeView.swift"
           - "Import/ImportView.swift"
+          - "Rooms/RoomSettingsView.swift"
       - path: Resources
         excludes:
           - "Sounds/readme.txt"
