@@ -65,15 +65,21 @@ struct ImportView: View {
               let codeIdx = headers.firstIndex(of: "code") ?? headers.firstIndex(of: "Code") ?? headers.firstIndex(of: "hex") else {
             throw ImportError.invalidCSV
         }
+        let remoteIdx = headers.firstIndex(of: "remote") ?? headers.firstIndex(of: "Remote")
         let protoIdx = headers.firstIndex(of: "protocol") ?? headers.firstIndex(of: "Protocol")
         let bitsIdx = headers.firstIndex(of: "bits") ?? headers.firstIndex(of: "Bits")
-
         for i in 1..<rows.count {
             let cols = rows[i].components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
             guard cols.count > max(nameIdx, codeIdx) else { continue }
 
-            let remoteName = cols[nameIdx]
+            let buttonName = cols[nameIdx]
             let code = cols[codeIdx]
+            let remoteName: String
+            if let r = remoteIdx, cols.count > r {
+                remoteName = cols[r]
+            } else {
+                remoteName = buttonName
+            }
 
             let fetchRequest: NSFetchRequest<Remote> = Remote.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "name == %@", remoteName)
@@ -92,7 +98,7 @@ struct ImportView: View {
 
             let newButton = Button(context: viewContext)
             newButton.id = UUID()
-            newButton.name = "Bouton \((remote.buttons?.count ?? 0) + 1)"
+            newButton.name = buttonName
             newButton.irCode = code
             if let b = bitsIdx, cols.count > b { newButton.bitCount = Int16(cols[b]) ?? 0 }
             newButton.remote = remote
