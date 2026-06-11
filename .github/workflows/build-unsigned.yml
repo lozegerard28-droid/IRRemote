@@ -67,18 +67,13 @@ jobs:
           echo "=== END BUILD LOG ==="
           if [ "$EXIT_CODE" -ne 0 ]; then exit $EXIT_CODE; fi
 
-      - name: Show build errors in summary
+      - name: Upload build log on failure
         if: failure()
-        run: |
-          cd IRRemote
-          echo "### Build failed - Last 100 lines" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          grep -iE 'error:|: error:|fatal|FAILED|The following build commands failed' build.log | head -50 >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "### Full log (last 100 lines)" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          tail -100 build.log >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: IRRemote/build.log
+          if-no-files-found: warn
 
       - name: Package IPA
         run: |
