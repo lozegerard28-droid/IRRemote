@@ -15,7 +15,15 @@ jobs:
           path: IRRemote
 
       - name: Setup Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer
+        run: |
+          ls /Applications | grep -i xcode
+          XCODE_APP=$(ls -d /Applications/Xcode*.app 2>/dev/null | head -1)
+          echo "Found Xcode: $XCODE_APP"
+          if [ -n "$XCODE_APP" ]; then
+            sudo xcode-select -s "$XCODE_APP/Contents/Developer"
+          fi
+          xcode-select -p
+          xcrun --sdk iphoneos --show-sdk-version 2>/dev/null || echo "No iOS SDK found yet"
 
       - name: Install XcodeGen
         run: |
@@ -29,13 +37,14 @@ jobs:
 
       - name: Build (unsigned)
         run: |
-          set -x
           cd IRRemote
           PROJ=$(ls -d *.xcodeproj 2>/dev/null | head -1)
           echo "Project: $PROJ"
-          xcodebuild clean build -project "$PROJ" \
+          SDK=$(xcrun --sdk iphoneos --show-sdk-path 2>/dev/null)
+          echo "SDK: $SDK"
+          xcodebuild clean build \
+            -project "$PROJ" \
             -scheme IRRemote \
-            -sdk iphoneos \
             -configuration Release \
             -derivedDataPath build/derived \
             -destination generic/platform=iOS \
