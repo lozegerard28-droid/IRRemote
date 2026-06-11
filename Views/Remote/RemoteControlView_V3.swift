@@ -86,6 +86,8 @@ struct DongleConnectView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var dongleManager = DongleManager.shared
     @State private var scanned = false
+    @State private var showNotFoundAlert = false
+    @State private var showConnectedAlert = false
 
     var body: some View {
         NavigationView {
@@ -101,7 +103,7 @@ struct DongleConnectView: View {
                 ForEach(dongleManager.availableDongles) { dongle in
                     SwiftButton {
                         dongleManager.connect(to: dongle.id)
-                        dismiss()
+                        showConnectedAlert = true
                     } label: {
                         VStack(alignment: .leading) {
                             Text(dongle.name).font(.headline)
@@ -112,6 +114,17 @@ struct DongleConnectView: View {
             }
             .navigationTitle("Dongle IR")
             .toolbar { ToolbarItem(placement: .navigationBarLeading) { SwiftButton("Annuler") { dismiss() } } }
+            .onChange(of: scanned) { if $0 && dongleManager.availableDongles.isEmpty { showNotFoundAlert = true } }
+            .alert("Dongle non trouvé", isPresented: $showNotFoundAlert) {
+                SwiftButton("OK") { }
+            } message: {
+                Text("Aucun dongle USB IR détecté. Vérifie que le dongle est bien branché.")
+            }
+            .alert("Dongle connecté", isPresented: $showConnectedAlert) {
+                SwiftButton("OK") { dismiss() }
+            } message: {
+                Text("Le dongle IR est prêt à être utilisé.")
+            }
         }
     }
 }
