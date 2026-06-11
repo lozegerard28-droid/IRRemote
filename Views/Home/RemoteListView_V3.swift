@@ -5,11 +5,8 @@ struct RemoteListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(sortDescriptors: [SortDescriptor(\.name, order: .forward)]) private var remotes: FetchedResults<Remote>
 
-    @State private var showingDeleteAlert = false
-    @State private var remoteToDelete: Remote?
-
     var body: some View {
-        NavigationStack {
+        NavigationView {
             List {
                 ForEach(remotes) { remote in
                     NavigationLink(destination: RemoteControlView(remote: remote)) {

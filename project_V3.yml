@@ -65,6 +65,8 @@ targets:
           - "Security/BiometricService.swift"
           - "IR/DongleManager.swift"
           - "IR/DongleManager_V2.swift"
+          - "IR/IRReceiverService.swift"
+          - "IR/IRTransmitterService.swift"
           - "History/HistoryService.swift"
           - "ImportExport/ExportService.swift"
           - "ImportExport/RemoteExportService.swift"

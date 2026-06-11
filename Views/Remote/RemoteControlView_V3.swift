@@ -1,9 +1,10 @@
 import SwiftUI
 import CoreData
 
+typealias SwiftButton = SwiftUI.Button
+
 struct RemoteControlView: View {
     let remote: Remote
-    @EnvironmentObject var appState: AppState
 
     @FetchRequest private var buttons: FetchedResults<Button>
     @StateObject private var dongleManager = DongleManager.shared
@@ -26,7 +27,7 @@ struct RemoteControlView: View {
                     Label("Connecté", systemImage: "antenna.radiowaves.left.and.right")
                         .foregroundColor(.green)
                 } else {
-                    Button("Connecter dongle") { showingDongleSheet = true }
+                    SwiftButton("Connecter dongle") { showingDongleSheet = true }
                 }
             }
             .padding(.horizontal)
@@ -35,7 +36,7 @@ struct RemoteControlView: View {
             ScrollView {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 12) {
                     ForEach(buttons) { button in
-                        Button(action: { sendIRCode(button) }) {
+                        SwiftButton(action: { sendIRCode(button) }) {
                             VStack(spacing: 4) {
                                 Text(button.name ?? "?")
                                     .font(.caption)
@@ -62,7 +63,7 @@ struct RemoteControlView: View {
             DongleConnectView()
         }
         .alert("Erreur", isPresented: $showingError) {
-            Button("OK") { }
+            SwiftButton("OK") { }
         } message: {
             Text(sendError ?? "Erreur inconnue")
         }
@@ -87,7 +88,7 @@ struct DongleConnectView: View {
     @State private var scanned = false
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             List {
                 if dongleManager.availableDongles.isEmpty {
                     if !scanned {
@@ -98,7 +99,7 @@ struct DongleConnectView: View {
                     }
                 }
                 ForEach(dongleManager.availableDongles) { dongle in
-                    Button {
+                    SwiftButton {
                         dongleManager.connect(to: dongle.id)
                         dismiss()
                     } label: {
@@ -110,7 +111,7 @@ struct DongleConnectView: View {
                 }
             }
             .navigationTitle("Dongle IR")
-            .toolbar { ToolbarItem(placement: .cancellation) { Button("Annuler") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .cancellation) { SwiftButton("Annuler") { dismiss() } } }
         }
     }
 }

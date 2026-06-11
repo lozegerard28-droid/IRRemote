@@ -2,9 +2,10 @@ import SwiftUI
 import CoreData
 import UniformTypeIdentifiers
 
+typealias SwiftButton = SwiftUI.Button
+
 struct ImportView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @EnvironmentObject var appState: AppState
 
     @State private var showingFilePicker = false
     @State private var showingManualAdd = false
@@ -12,13 +13,13 @@ struct ImportView: View {
     @State private var showingError = false
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             List {
-                Button { showingFilePicker = true } label: {
+                SwiftButton { showingFilePicker = true } label: {
                     Label("Importer depuis CSV", systemImage: "doc.text")
                 }
 
-                Button { showingManualAdd = true } label: {
+                SwiftButton { showingManualAdd = true } label: {
                     Label("Ajouter manuellement", systemImage: "plus.circle")
                 }
             }
@@ -30,7 +31,7 @@ struct ImportView: View {
                 ManualAddView()
             }
             .alert("Erreur", isPresented: $showingError) {
-                Button("OK") { }
+                SwiftButton("OK") { }
             } message: {
                 Text(importError ?? "Erreur inconnue")
             }
@@ -89,12 +90,12 @@ struct ImportView: View {
                 remote.createdAt = Date()
             }
 
-            let button = Button(context: viewContext)
-            button.id = UUID()
-            button.name = "Bouton \((remote.buttons?.count ?? 0) + 1)"
-            button.irCode = code
-            if let b = bitsIdx, cols.count > b { button.bitCount = Int16(cols[b]) ?? 0 }
-            button.remote = remote
+            let newButton = Button(context: viewContext)
+            newButton.id = UUID()
+            newButton.name = "Bouton \((remote.buttons?.count ?? 0) + 1)"
+            newButton.irCode = code
+            if let b = bitsIdx, cols.count > b { newButton.bitCount = Int16(cols[b]) ?? 0 }
+            newButton.remote = remote
         }
         try viewContext.save()
     }
@@ -106,24 +107,22 @@ struct ManualAddView: View {
 
     @State private var remoteName = ""
     @State private var code = ""
-    @State private var protocolName = "NEC"
-    @State private var bits = "32"
     @State private var errorMessage: String?
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             Form {
                 Section("Informations") {
                     TextField("Nom de la télécommande", text: $remoteName)
                     TextField("Code hexadécimal (ex: FF00FF00)", text: $code)
                 }
                 Section {
-                    Button("Ajouter") { addRemote() }
+                    SwiftButton("Ajouter") { addRemote() }
                         .disabled(remoteName.isEmpty || code.isEmpty)
                 }
             }
             .navigationTitle("Ajout manuel")
-            .toolbar { ToolbarItem(placement: .cancellation) { Button("Annuler") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .cancellation) { SwiftButton("Annuler") { dismiss() } } }
         }
     }
 
@@ -131,15 +130,14 @@ struct ManualAddView: View {
         let remote = Remote(context: viewContext)
         remote.id = UUID()
         remote.name = remoteName
-        remote.category = protocolName
         remote.createdAt = Date()
 
-        let button = Button(context: viewContext)
-        button.id = UUID()
-        button.name = "Bouton 1"
-        button.irCode = code
-        button.bitCount = Int16(bits) ?? 32
-        button.remote = remote
+        let newButton = Button(context: viewContext)
+        newButton.id = UUID()
+        newButton.name = "Bouton 1"
+        newButton.irCode = code
+        newButton.bitCount = 32
+        newButton.remote = remote
 
         do {
             try viewContext.save()

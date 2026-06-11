@@ -4,15 +4,15 @@ struct SettingsView: View {
     @StateObject private var dongleManager = DongleManager.shared
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             Form {
                 Section("Dongle IR") {
                     if dongleManager.isConnected {
                         Label("Connecté", systemImage: "antenna.radiowaves.left.and.right")
                             .foregroundColor(.green)
-                        Button("Déconnecter") { dongleManager.disconnect() }
+                        SwiftUI.Button("Déconnecter") { dongleManager.disconnect() }
                     } else {
-                        Button("Rechercher un dongle") {
+                        SwiftUI.Button("Rechercher un dongle") {
                             Task { await dongleManager.scanForDongles() }
                         }
                     }
