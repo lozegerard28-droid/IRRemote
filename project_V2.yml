@@ -30,6 +30,7 @@ targets:
           - "Protocols/ServiceProtocols.swift"
           - "Helpers/AppError.swift"
           - "Helpers/PersistenceController.swift"
+          - "Helpers/ThemeManager.swift"
       - path: Models
         excludes:
           - "CoreData/Remote+CoreDataClass.swift"
@@ -67,6 +68,7 @@ targets:
           - "Home/HomeView.swift"
           - "Import/ImportView.swift"
           - "Rooms/RoomSettingsView.swift"
+          - "Onboarding/OnboardingView.swift"
       - path: Resources
         excludes:
           - "Sounds/readme.txt"
