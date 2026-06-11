@@ -65,6 +65,7 @@ targets:
           - "Security/BiometricService.swift"
           - "IR/DongleManager.swift"
           - "IR/DongleManager_V2.swift"
+          - "IR/DongleManager_V3.swift"
           - "IR/IRReceiverService.swift"
           - "IR/IRTransmitterService.swift"
           - "History/HistoryService.swift"
@@ -91,6 +92,7 @@ targets:
           - "Home/RoomSectionView.swift"
           - "Import/ImportView.swift"
           - "Import/ImportView_V2.swift"
+          - "Import/ImportView_V3.swift"
           - "Rooms/RoomSettingsView.swift"
           - "Rooms/RoomListView.swift"
           - "Onboarding/OnboardingView.swift"
@@ -98,9 +100,11 @@ targets:
           - "Components/ThemePreviewView.swift"
           - "Components/RemoteButtonEditor.swift"
           - "Remote/RemoteControlView.swift"
+          - "Remote/RemoteControlView_V3.swift"
           - "Remote/RemoteControlLandscapeView.swift"
           - "Scenarios/ScenarioListView.swift"
           - "Settings/SettingsView.swift"
+          - "Settings/SettingsView_V3.swift"
           - "History/HistoryView.swift"
       - path: Resources
         excludes:
