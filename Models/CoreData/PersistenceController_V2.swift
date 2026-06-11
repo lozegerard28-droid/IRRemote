@@ -1,11 +1,10 @@
 import CoreData
+import OSLog
 
 struct PersistenceController {
     static let shared = PersistenceController()
     let container: NSPersistentContainer
 
-    /// Crée un conteneur persistant. Préférer `PersistenceController.shared`.
-    /// Utiliser `inMemory: true` uniquement pour les previews SwiftUI.
     init(inMemory: Bool = false) {
         container = NSPersistentContainer(name: "IRRemote")
         if inMemory {
@@ -25,6 +24,6 @@ struct PersistenceController {
     func save() {
         let context = container.viewContext
         guard context.hasChanges else { return }
-        do { try context.save() } catch { AppLogger.error("Save failed: \(error)", category: AppLogger.data) }
+        do { try context.save() } catch { Logger.app.error("Save failed: \(error)") }
     }
 }

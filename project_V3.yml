@@ -1,0 +1,116 @@
+name: IRRemote_V3
+options:
+  bundleIdPrefix: com.irremote
+  deploymentTarget:
+    iOS: "15.0"
+  xcodeVersion: "15.0"
+
+settings:
+  SWIFT_VERSION: "5.9"
+  TARGETED_DEVICE_FAMILY: "1,2"
+  INFOPLIST_FILE: Resources/Info.plist
+  PRODUCT_BUNDLE_IDENTIFIER: com.irremote.app
+
+packages:
+  ZIPFoundation:
+    url: https://github.com/weichsel/ZIPFoundation.git
+    from: 0.9.0
+
+targets:
+  IRRemote:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+        excludes:
+          - "AppCoordinator.swift"
+          - "AppCoordinator_V2.swift"
+          - "IRRemoteApp.swift"
+          - "MainTabView.swift"
+      - path: Core
+        excludes:
+          - "Extensions/Color+Hex.swift"
+          - "Protocols/ServiceProtocols.swift"
+          - "Protocols/ImportExportable.swift"
+          - "Protocols/Exportable.swift"
+          - "Protocols/DongleDriver.swift"
+          - "Protocols/IRTransmittable.swift"
+          - "Helpers/AppError.swift"
+          - "Helpers/PersistenceController.swift"
+          - "Helpers/ThemeManager.swift"
+      - path: Models
+        excludes:
+          - "CoreData/Remote+CoreDataClass.swift"
+          - "CoreData/Remote+CoreDataProperties.swift"
+          - "CoreData/Remote+CoreDataProperties_V2.swift"
+          - "CoreData/Remote.swift"
+          - "CoreData/Button.swift"
+          - "CoreData/HistoryEvent.swift"
+          - "CoreData/Room.swift"
+          - "CoreData/Scenario.swift"
+          - "CoreData/ScenarioStep.swift"
+          - "CoreData/Theme.swift"
+          - "CoreData/PersistenceController.swift"
+          - "Enums/AppError.swift"
+          - "Enums/AppSettings.swift"
+          - "Enums/DongleCapabilities.swift"
+      - path: Services
+        excludes:
+          - "Backup/BackupService.swift"
+          - "Backup/BackupService_V2.swift"
+          - "Feedback/FlashService.swift"
+          - "Feedback/HapticService.swift"
+          - "Feedback/AudioService.swift"
+          - "Feedback/HapticService_V2.swift"
+          - "Security/BiometricService.swift"
+          - "IR/DongleManager.swift"
+          - "IR/DongleManager_V2.swift"
+          - "History/HistoryService.swift"
+          - "ImportExport/ExportService.swift"
+          - "ImportExport/RemoteExportService.swift"
+      - path: ViewModels
+        excludes:
+          - "RemoteControlViewModel.swift"
+          - "RemoteControlViewModel_V2.swift"
+          - "ScenarioViewModel.swift"
+          - "ScenarioViewModel_V2.swift"
+          - "HomeViewModel.swift"
+          - "HomeViewModel_V2.swift"
+          - "RoomViewModel.swift"
+          - "ImportViewModel.swift"
+          - "RoomListViewModel.swift"
+          - "SettingsViewModel.swift"
+          - "HistoryViewModel.swift"
+          - "AppState.swift"
+      - path: Views
+        excludes:
+          - "Home/HomeView.swift"
+          - "Home/HomeView_V2.swift"
+          - "Home/RoomSectionView.swift"
+          - "Import/ImportView.swift"
+          - "Import/ImportView_V2.swift"
+          - "Rooms/RoomSettingsView.swift"
+          - "Rooms/RoomListView.swift"
+          - "Onboarding/OnboardingView.swift"
+          - "Components/OnboardingView.swift"
+          - "Components/ThemePreviewView.swift"
+          - "Components/RemoteButtonEditor.swift"
+          - "Remote/RemoteControlView.swift"
+          - "Remote/RemoteControlLandscapeView.swift"
+          - "Scenarios/ScenarioListView.swift"
+          - "Settings/SettingsView.swift"
+          - "History/HistoryView.swift"
+      - path: Resources
+        excludes:
+          - "Sounds/readme.txt"
+    info:
+      path: Resources/Info.plist
+    entitlements:
+      path: Resources/Entitlements.plist
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.irremote.app
+      DEVELOPMENT_TEAM: ""
+      CODE_SIGN_STYLE: Manual
+      CODE_SIGN_IDENTITY: "Apple Development"
+    dependencies:
+      - package: ZIPFoundation

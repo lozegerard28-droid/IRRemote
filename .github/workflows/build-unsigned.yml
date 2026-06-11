@@ -38,7 +38,7 @@ jobs:
       - name: Generate Xcode project
         run: |
           cd IRRemote
-          xcodegen generate --spec project_V2.yml 2>&1
+          xcodegen generate --spec project_V3.yml 2>&1
           ls -la *.xcodeproj
 
       - name: Build (unsigned)

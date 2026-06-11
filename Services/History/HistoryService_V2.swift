@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 
 @MainActor
-class HistoryService: Historiable {
+class HistoryService {
     static let shared = HistoryService()
     private let maxEvents = 500
 
